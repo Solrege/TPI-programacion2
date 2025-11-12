@@ -45,9 +45,32 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
 
     }
 
-    public boolean existeFichaAsociada(int idFicha, Connection conn) throws SQLException {
+    // TODO: Ver si poner sentencia sql como constante y chequear que nombre de las columnas sean válidos
+    public FichaBibliografica getByISBN(String isbn, Connection conn) throws SQLException {
+        String sql = "SELECT id, isbn, clasificacionDewey, estanteria FROM ficha_bibliografica WHERE isbn = ? AND eliminado = FALSE";
 
-        // TODO: Ver si poner sentencia sql como constante
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, isbn);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    FichaBibliografica ficha = new FichaBibliografica();
+                    ficha.setId(rs.getInt("id"));
+                    ficha.setIsbn(rs.getString("isbn"));
+                    ficha.setClasificadoDewey(rs.getString("clasificacionDewey"));
+                    ficha.setEstanteria(rs.getString("estanteria"));
+                    ficha.setIdioma(rs.getString("idioma"));
+
+                    return ficha;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // TODO: Ver si poner sentencia sql como constante y chequear que nombre de la columna sea válido
+    public boolean existeFichaAsociada(int idFicha, Connection conn) throws SQLException {
         String sql = "SELECT COUNT(*) FROM libro WHERE ficha_id = ? AND eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
