@@ -7,7 +7,6 @@ import trabajo_integrador.models.FichaBibliografica;
 import trabajo_integrador.models.Libro;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.Year;
 import java.util.List;
 
@@ -21,18 +20,17 @@ public class LibroService implements GenericService<Libro> {
     }
 
     @Override
-    public void insertar(Libro libro) throws Exception {
+    public boolean insertar(Libro libro) throws Exception {
+        FichaBibliografica ficha = libro.getFicha();
+
         // VALIDACIONES
         validacionesInsertLibro(libro);
+        FichaBibliograficaService.validacionesInsertFicha(ficha);
 
         try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
 
             try {
-                FichaBibliografica ficha = libro.getFicha();
-
-                // TODO: VALIDACIONES PARA FICHA
-
                 // Búsqueda de Ficha existente mediante el ISBN
                 FichaBibliografica fichaExiste = fichaBibliograficaDAO.getByISBN(ficha.getIsbn(), conn);
 
@@ -70,15 +68,15 @@ public class LibroService implements GenericService<Libro> {
                 conn.setAutoCommit(true);
             }
 
-            System.out.println("Libro y Ficha creada correctamente");
         } catch (Exception e) {
             throw new Exception("Error inesperado al insertar libro", e);
         }
 
+        return true;
     }
 
     @Override
-    public void actualizar(Libro libro) throws Exception {
+    public boolean actualizar(Libro libro) throws Exception {
         //VALIDACIONES
         validacionesUpdateLibro(libro);
         getById(libro.getId());
@@ -89,10 +87,12 @@ public class LibroService implements GenericService<Libro> {
         } catch (Exception e) {
             throw new Exception("Error al actualizar libro: " + e.getMessage());
         }
+
+        return true;
     }
 
     @Override
-    public void eliminar(int id) throws Exception {
+    public boolean eliminar(int id) throws Exception {
         // VALIDACIONES
         getById(id);
 
@@ -102,6 +102,8 @@ public class LibroService implements GenericService<Libro> {
         } catch (Exception e) {
             throw new Exception("Error al eliminar libro: " + e.getMessage());
         }
+
+        return true;
     }
 
     @Override
@@ -110,7 +112,13 @@ public class LibroService implements GenericService<Libro> {
         validacionID(id);
 
         try {
-            return libroDAO.leer(id);
+            Libro libro = libroDAO.leer(id);
+            if (libro == null) {
+                throw new Exception("El libro no existe");
+            }
+
+            return libro;
+
         } catch (Exception e) {
             throw new Exception("Error al leer libro: " + e.getMessage());
         }
@@ -125,7 +133,7 @@ public class LibroService implements GenericService<Libro> {
         }
     }
 
-    private void validacionesInsertLibro(Libro libro) throws Exception {
+    private static void validacionesInsertLibro(Libro libro)  {
         if (libro == null)
             throw new IllegalArgumentException("El libro no puede ser nulo.");
 
@@ -157,12 +165,12 @@ public class LibroService implements GenericService<Libro> {
 
     }
 
-    private void validacionesUpdateLibro(Libro libro) throws Exception {
+    private static void validacionesUpdateLibro(Libro libro)  {
         validacionID(libro.getId());
         validacionesInsertLibro(libro);
     }
 
-    private void validacionID(int id) throws Exception {
+    private static void validacionID(int id)  {
         if (id <= 0) {
             throw new IllegalArgumentException("El ID del libro no puede ser 0 o negativo.");
         }
