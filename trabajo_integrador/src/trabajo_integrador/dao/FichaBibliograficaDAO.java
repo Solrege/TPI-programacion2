@@ -11,38 +11,63 @@ import java.util.List;
 public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
 
     @Override
-    public void insertar(FichaBibliografica fichaBibliografica) throws Exception {
+    public void crear(FichaBibliografica fichaBibliografica, Connection conn) throws Exception {
 
     }
 
     @Override
-    public void insertarTx(FichaBibliografica fichaBibliografica, Connection conn) throws Exception {
+    public void crear(FichaBibliografica entidad) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void actualizar(FichaBibliografica fichaBibliografica, Connection conn) throws Exception {
 
     }
 
     @Override
-    public void actualizar(FichaBibliografica fichaBibliografica) throws Exception {
+    public void actualizar(FichaBibliografica entidad) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void eliminar(int id, Connection conn) throws Exception {
 
     }
 
     @Override
     public void eliminar(int id) throws Exception {
-
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public FichaBibliografica getById(int id) throws Exception {
-        return null;
+    public FichaBibliografica leer(int id, Connection conn) throws Exception {
+        return new FichaBibliografica();
     }
 
     @Override
-    public List<FichaBibliografica> getAll() throws Exception {
+    public FichaBibliografica leer(int id) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public List<FichaBibliografica> leerTodos(Connection conn) throws Exception {
         return List.of();
     }
 
     @Override
-    public void recuperar(int id) throws Exception {
+    public List<FichaBibliografica> leerTodos() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
+    @Override
+    public void recuperar(int id, Connection conn) throws Exception {
+
+    }
+
+    @Override
+    public void recuperar(int id) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     // TODO: Ver si poner sentencia sql como constante y chequear que nombre de las columnas sean válidos

@@ -18,7 +18,7 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
         // Validaciones
 
         System.out.println("Insertando Ficha Bibliografica.....");
-        FichaBibliograficaDAO.insertar(ficha);
+        FichaBibliograficaDAO.crear(ficha);
 
     }
 
@@ -36,11 +36,11 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
 
     @Override
     public FichaBibliografica getById(int id) throws Exception {
-        return FichaBibliograficaDAO.getById(id);
+        return FichaBibliograficaDAO.leer(id);
     }
 
     @Override
     public List<FichaBibliografica> getAll() throws Exception {
-        return FichaBibliograficaDAO.getAll();
+        return FichaBibliograficaDAO.leerTodos();
     }
 }

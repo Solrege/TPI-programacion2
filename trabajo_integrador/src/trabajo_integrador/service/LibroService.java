@@ -1,5 +1,6 @@
 package trabajo_integrador.service;
 
+import trabajo_integrador.config.DatabaseConnection;
 import trabajo_integrador.dao.FichaBibliograficaDAO;
 import trabajo_integrador.dao.GenericDAO;
 import trabajo_integrador.dao.LibroDAO;
@@ -23,7 +24,7 @@ public class LibroService implements GenericService<Libro> {
         // VALIDACIONES
 
         // TODO: REFACTOR CON NOMBRE REAL DE LA CLASE Y DEL METODO
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
 
             FichaBibliografica ficha = libro.getFicha();
@@ -43,11 +44,11 @@ public class LibroService implements GenericService<Libro> {
 
             } else {
                 // Como no existe, se crea
-                fichaBibliograficaDAO.insertarTx(ficha, conn);
+                fichaBibliograficaDAO.crear(ficha, conn);
             }
 
             // Creación de Libro
-            libroDAO.insertarTx(libro, conn);
+            libroDAO.crear(libro, conn);
 
             conn.commit();
             conn.setAutoCommit(true);
@@ -75,11 +76,11 @@ public class LibroService implements GenericService<Libro> {
 
     @Override
     public Libro getById(int id) throws Exception {
-        return libroDAO.getById(id);
+        return libroDAO.leer(id);
     }
 
     @Override
     public List<Libro> getAll() throws Exception {
-        return libroDAO.getAll();
+        return libroDAO.leerTodos();
     }
 }
