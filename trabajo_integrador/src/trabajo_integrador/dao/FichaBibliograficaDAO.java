@@ -1,6 +1,7 @@
 package trabajo_integrador.dao;
 
 import trabajo_integrador.models.FichaBibliografica;
+import trabajo_integrador.models.Idioma;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -84,7 +85,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
                     ficha.setIsbn(rs.getString("isbn"));
                     ficha.setClasificadoDewey(rs.getString("clasificacionDewey"));
                     ficha.setEstanteria(rs.getString("estanteria"));
-                    ficha.setIdioma(rs.getString("idioma"));
+                    ficha.setIdioma(Idioma.valueOf(rs.getString("idioma")));
 
                     return ficha;
                 }
