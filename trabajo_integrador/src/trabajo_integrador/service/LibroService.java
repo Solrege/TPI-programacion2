@@ -2,12 +2,13 @@ package trabajo_integrador.service;
 
 import trabajo_integrador.config.DatabaseConnection;
 import trabajo_integrador.dao.FichaBibliograficaDAO;
-import trabajo_integrador.dao.GenericDAO;
 import trabajo_integrador.dao.LibroDAO;
 import trabajo_integrador.models.FichaBibliografica;
 import trabajo_integrador.models.Libro;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.Year;
 import java.util.List;
 
 public class LibroService implements GenericService<Libro> {
@@ -22,40 +23,56 @@ public class LibroService implements GenericService<Libro> {
     @Override
     public void insertar(Libro libro) throws Exception {
         // VALIDACIONES
+        validacionesInsertLibro(libro);
 
-        // TODO: REFACTOR CON NOMBRE REAL DE LA CLASE Y DEL METODO
         try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
 
-            FichaBibliografica ficha = libro.getFicha();
+            try {
+                FichaBibliografica ficha = libro.getFicha();
 
-            // Búsqueda de Ficha existente mediante el ISBN
-            FichaBibliografica fichaExiste = fichaBibliograficaDAO.getByISBN(ficha.getIsbn(), conn);
+                // TODO: VALIDACIONES PARA FICHA
 
-            // Si existe, se verifica que no esté asociada, se reutiliza y se setea en Libro.
-            if (fichaExiste != null) {
+                // Búsqueda de Ficha existente mediante el ISBN
+                FichaBibliografica fichaExiste = fichaBibliograficaDAO.getByISBN(ficha.getIsbn(), conn);
 
-                // Verificación que en Ficha no exista otro Libro
-                if (fichaBibliograficaDAO.existeFichaAsociada(libro.getFicha().getId(), conn)) {
-                    throw new IllegalArgumentException("La Ficha Bibliográfica ya está asociada a otro libro");
+                // Si existe, se verifica que no esté asociada, se reutiliza y se setea en Libro.
+                if (fichaExiste != null) {
+
+                    // Verificación que Ficha no esté asociada a otro libro
+                    if (fichaBibliograficaDAO.existeFichaAsociada(fichaExiste.getId(), conn)) {
+                        throw new IllegalArgumentException("La Ficha Bibliográfica ya está asociada a otro libro");
+                    }
+
+                    libro.setFicha(fichaExiste);
+
+                } else {
+                    // Como no existe, se crea
+                    try {
+                        fichaBibliograficaDAO.crear(ficha, conn);
+                    } catch (Exception e) {
+                        throw new Exception("Error al crear el libro", e);
+                    }
                 }
 
-                libro.setFicha(fichaExiste);
+                // Creación de Libro
+                try {
+                    libroDAO.crear(libro, conn);
+                } catch (Exception e) {
+                    throw new Exception("Error al crear libro", e);
+                }
 
-            } else {
-                // Como no existe, se crea
-                fichaBibliograficaDAO.crear(ficha, conn);
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                throw new Exception("Error al insertar libro y ficha", e);
+            } finally {
+                conn.setAutoCommit(true);
             }
-
-            // Creación de Libro
-            libroDAO.crear(libro, conn);
-
-            conn.commit();
-            conn.setAutoCommit(true);
 
             System.out.println("Libro y Ficha creada correctamente");
         } catch (Exception e) {
-            throw new Exception("Error al insertar libro: " + e.getMessage());
+            throw new Exception("Error inesperado al insertar libro", e);
         }
 
     }
@@ -63,24 +80,91 @@ public class LibroService implements GenericService<Libro> {
     @Override
     public void actualizar(Libro libro) throws Exception {
         //VALIDACIONES
+        validacionesUpdateLibro(libro);
+        getById(libro.getId());
 
-        libroDAO.actualizar(libro);
-
+        // Actualización
+        try {
+            libroDAO.actualizar(libro);
+        } catch (Exception e) {
+            throw new Exception("Error al actualizar libro: " + e.getMessage());
+        }
     }
 
     @Override
     public void eliminar(int id) throws Exception {
-        libroDAO.eliminar(id);
+        // VALIDACIONES
+        getById(id);
 
+        // Eliminación
+        try {
+            libroDAO.eliminar(id);
+        } catch (Exception e) {
+            throw new Exception("Error al eliminar libro: " + e.getMessage());
+        }
     }
 
     @Override
     public Libro getById(int id) throws Exception {
-        return libroDAO.leer(id);
+        // VALIDACIONES
+        validacionID(id);
+
+        try {
+            return libroDAO.leer(id);
+        } catch (Exception e) {
+            throw new Exception("Error al leer libro: " + e.getMessage());
+        }
     }
 
     @Override
     public List<Libro> getAll() throws Exception {
-        return libroDAO.leerTodos();
+        try {
+            return libroDAO.leerTodos();
+        }  catch (Exception e) {
+            throw new Exception("Error al leer libros: " + e.getMessage());
+        }
+    }
+
+    private void validacionesInsertLibro(Libro libro) throws Exception {
+        if (libro == null)
+            throw new IllegalArgumentException("El libro no puede ser nulo.");
+
+        if (libro.getTitulo() == null || libro.getTitulo().isBlank())
+            throw new IllegalArgumentException("El título del libro es obligatorio.");
+
+        if (libro.getTitulo().length() > 150) {
+            throw new IllegalArgumentException("El título no puede exceder los 150 caracteres.");
+        }
+
+        if (libro.getAutor() == null || libro.getAutor().isBlank())
+            throw new IllegalArgumentException("El autor del libro es obligatorio.");
+
+        if (libro.getAutor().length() > 120) {
+            throw new IllegalArgumentException("El nombre del autor no puede exceder los 120 caracteres.");
+        }
+
+        if (libro.getEditorial().length() > 100) {
+            throw new IllegalArgumentException("El nombre de la editorial no puede exceder los 100 caracteres.");
+        }
+
+        int currentYear = Year.now().getValue();
+        if (libro.getAnioEdicion() < 1400 || libro.getAnioEdicion() > currentYear) {
+            throw new IllegalArgumentException("El año de edición debe ser válido (entre 1400 y " + currentYear + ")");
+        }
+
+        if (libro.getFicha() == null)
+            throw new IllegalArgumentException("El libro debe tener una ficha bibliográfica asociada.");
+
+    }
+
+    private void validacionesUpdateLibro(Libro libro) throws Exception {
+        validacionID(libro.getId());
+        validacionesInsertLibro(libro);
+    }
+
+    private void validacionID(int id) throws Exception {
+        if (id <= 0) {
+            throw new IllegalArgumentException("El ID del libro no puede ser 0 o negativo.");
+        }
     }
 }

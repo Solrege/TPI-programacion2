@@ -16,6 +16,7 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     @Override
     public void insertar(FichaBibliografica ficha) throws Exception {
         // Validaciones
+        validacionesFicha(ficha);
 
         System.out.println("Insertando Ficha Bibliografica.....");
         FichaBibliograficaDAO.crear(ficha);
@@ -42,5 +43,12 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     @Override
     public List<FichaBibliografica> getAll() throws Exception {
         return FichaBibliograficaDAO.leerTodos();
+    }
+
+    private void validacionesFicha(FichaBibliografica ficha) throws Exception {
+        if (ficha == null)
+            throw new IllegalArgumentException("La ficha no puede ser nula.");
+        if (ficha.getIsbn() == null || ficha.getIsbn().isBlank())
+            throw new IllegalArgumentException("El ISBN es obligatorio.");
     }
 }
