@@ -12,7 +12,6 @@ public interface GenericDAO<T> {
     T leer(int id, Connection conn) throws Exception;
 
     T leer(int id) throws Exception;
-    // eliminado = TRUE -> lanza excepcion
 
     List<T> leerTodos(Connection conn) throws Exception;
 
@@ -21,7 +20,6 @@ public interface GenericDAO<T> {
     void actualizar(T entidad, Connection conn) throws Exception;
 
     void actualizar(T entidad) throws Exception;
-    // eliminado = TRUE -> lanza excepcion
 
     void eliminar(int id, Connection conn) throws Exception;
 
