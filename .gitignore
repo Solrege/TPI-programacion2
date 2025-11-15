@@ -3,7 +3,18 @@
 *.iml
 
 # NetBeans
-nbproject/
+nbproject/private/
+nbproject/genfiles.properties
+nbproject/build-impl.xml
+
+trabajo_integrador/nbproject/private
+/trabajo_integrador/nbproject/genfiles.properties
+/trabajo_integrador/nbproject/build-impl.xml
+
 build/
 dist/
 nbbuild.xml
+
+
+
+
