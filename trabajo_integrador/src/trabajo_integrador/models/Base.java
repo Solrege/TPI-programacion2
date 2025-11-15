@@ -31,7 +31,4 @@ private boolean eliminado;
         this.eliminado = eliminado;
     }
 
-
-
-
 }

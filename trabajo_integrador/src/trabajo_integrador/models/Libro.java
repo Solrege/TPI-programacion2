@@ -22,6 +22,17 @@ public class Libro extends Base {
             this.editorial = editorial;
             this.anioEdicion = anioEdicion;
     }
+    
+public Libro(String titulo, String autor, String editorial, int anioEdicion, FichaBibliografica ficha) {
+    super(0, false);
+    this.titulo = titulo;
+    this.autor = autor;
+    this.editorial = editorial;
+    this.anioEdicion = anioEdicion;
+    this.ficha = ficha;
+}
+
+
 
     //GETTERS Y SETTERS
     public String getTitulo() {
