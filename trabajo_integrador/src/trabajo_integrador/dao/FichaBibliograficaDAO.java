@@ -18,7 +18,6 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
             stmt.setString(2, fichaBibliografica.getClasificadoDewey());
             stmt.setString(3, fichaBibliografica.getEstanteria());
             stmt.setString(4, fichaBibliografica.getIdioma().name());
-            stmt.setInt(5, fichaBibliografica.getId());
             stmt.executeUpdate();
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -32,7 +31,6 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
         }
 
     }
-    //probar
 
     @Override
     public void crear(FichaBibliografica fichaBibliografica) throws Exception {

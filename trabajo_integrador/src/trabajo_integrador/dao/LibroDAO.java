@@ -78,7 +78,7 @@ public class LibroDAO implements GenericDAO<Libro> {
 
     @Override
     public void eliminar(int id, Connection conn) throws Exception {
-        String sql = "UPDATE libro SET eliminado = TRUE, id_ficha = NULL WHERE id_libro = ?";
+        String sql = "UPDATE libro SET eliminado = TRUE WHERE id_libro = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -100,8 +100,7 @@ public class LibroDAO implements GenericDAO<Libro> {
 
     @Override
     public Libro leer(int id, Connection conn) throws Exception {
-        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anioEdicion" + "f.id AS ficha_id, f.estante, f.isbn"
-                + "FROM libro l LEFT JOIN fichaBibliografica f ON l.id_ficha = f.id" + "WHERE l.id = ? and l.eliminado = FALSE";
+        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anioEdicion, f.id AS ficha_id, f.estanteria, f.isbn FROM libro l LEFT JOIN FichaBibliografica f ON l.id_ficha = f.id WHERE l.id_libro = ? AND l.eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -109,17 +108,17 @@ public class LibroDAO implements GenericDAO<Libro> {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     Libro libro = new Libro();
-                    libro.setId(rs.getInt("id"));
+                    libro.setId(rs.getInt("id_libro"));
                     libro.setTitulo(rs.getString("titulo"));
                     libro.setAutor(rs.getString("autor"));
                     libro.setEditorial(rs.getString("editorial"));
                     libro.setAnioEdicion(rs.getInt("anioEdicion"));
 
-                    int fichaId = rs.getInt("id_ficha");
+                    int fichaId = rs.getInt("ficha_id");
                     if (fichaId > 0 && !rs.wasNull()) {
                         FichaBibliografica ficha = new FichaBibliografica();
                         ficha.setId(rs.getInt("ficha_id"));
-                        ficha.setEstanteria(rs.getString("estante"));
+                        ficha.setEstanteria(rs.getString("estanteria"));
                         ficha.setIsbn(rs.getString("isbn"));
                     }
 
@@ -142,31 +141,34 @@ public class LibroDAO implements GenericDAO<Libro> {
     public List<Libro> leerTodos(Connection conn) throws Exception {
         List<Libro> libros = new ArrayList<>();
 
-        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anioEdicion" + "f.id AS ficha_id, f.estante, f.isbn"
-                + "FROM libro l LEFT JOIN fichaBibliografica f ON l.id_ficha = f.id" + "WHERE l.id = ? and l.eliminado = FALSE";
+        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anioEdicion, f.id AS ficha_id, f.estanteria, f.isbn FROM libro l LEFT JOIN FichaBibliografica f ON l.id_ficha = f.id WHERE l.eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Libro libro = new Libro();
-                    libro.setId(rs.getInt("id"));
+                    libro.setId(rs.getInt("id_libro"));
                     libro.setTitulo(rs.getString("titulo"));
                     libro.setAutor(rs.getString("autor"));
                     libro.setEditorial(rs.getString("editorial"));
                     libro.setAnioEdicion(rs.getInt("anioEdicion"));
 
-                    int fichaId = rs.getInt("id_ficha");
-                    if (fichaId > 0 && !rs.wasNull()) {
+                    int fichaId = rs.getInt("ficha_id");
+                    if (!rs.wasNull()) {
                         FichaBibliografica ficha = new FichaBibliografica();
-                        ficha.setId(rs.getInt("ficha_id"));
-                        ficha.setEstanteria(rs.getString("estante"));
+                        ficha.setId(fichaId);
+                        ficha.setEstanteria(rs.getString("estanteria"));
                         ficha.setIsbn(rs.getString("isbn"));
+                        
+                        libro.setFicha(ficha);
                     }
+                    libros.add(libro);
                 }
             }
 
-            return libros;
+            
         }
+        return libros;
     }
 
     @Override
@@ -178,7 +180,7 @@ public class LibroDAO implements GenericDAO<Libro> {
 
     @Override
     public void recuperar(int id, Connection conn) throws Exception {
-        String sql = "UPDATE libro SET eliminado = FALSE, id_ficha = NULL WHERE id_libro = ?";
+        String sql = "UPDATE libro SET eliminado = FALSE WHERE id_libro = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
