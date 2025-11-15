@@ -4,10 +4,7 @@ import trabajo_integrador.models.FichaBibliografica;
 import trabajo_integrador.models.Idioma;
 import trabajo_integrador.config.DatabaseConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,12 +12,33 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
 
     @Override
     public void crear(FichaBibliografica fichaBibliografica, Connection conn) throws Exception {
+        String sql = "INSERT INTO fichaBibliografica (isbn,clasificadoDewey, estanteria, idioma) VALUES (?,?,?,?) ";
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+            stmt.setString(1, fichaBibliografica.getIsbn());
+            stmt.setString(2, fichaBibliografica.getClasificadoDewey());
+            stmt.setString(3, fichaBibliografica.getEstanteria());
+            stmt.setString(4, fichaBibliografica.getIdioma().name());
+            stmt.setInt(5, fichaBibliografica.getId());
+            stmt.executeUpdate();
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    fichaBibliografica.setId(generatedKeys.getInt(1));
+                    System.out.println("Ficha creada con ID: " + fichaBibliografica.getId());
+                } else {
+                    throw new Exception("La creación de la ficha falló. No se obtuvo el ID generado");
+                }
+            }
+        }
 
     }
+    //probar
 
     @Override
-    public void crear(FichaBibliografica entidad) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void crear(FichaBibliografica fichaBibliografica) throws Exception {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            this.crear(fichaBibliografica, conn);
+        }
     }
 
     @Override
@@ -36,28 +54,39 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
             int result = stmt.executeUpdate();
 
             if (result == 0) {
-                throw new Exception("El update falló");
+                throw new Exception("La actualizacion de la ficha " + fichaBibliografica.getId() + " falló.");
             }
         }
 
     }
 
     @Override
-    public void actualizar(FichaBibliografica ficha) throws Exception {
+    public void actualizar(FichaBibliografica fichaBibliografica) throws Exception {
         try (Connection conn = DatabaseConnection.getConnection()) {
-            this.actualizar(ficha, conn);
+            this.actualizar(fichaBibliografica, conn);
         }
     }
 
     @Override
     public void eliminar(int id, Connection conn) throws Exception {
+        String sql = "UPDATE fichaBibliografica SET eliminado = TRUE WHERE id = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            int result = stmt.executeUpdate();
+
+            if (result == 0) {
+                throw new Exception("La eliminación de la ficha " + id + " falló.");
+            }
+        }
 
     }
 
     @Override
     public void eliminar(int id) throws Exception {
-        // borrar la ficha y el libro asociado?
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            this.eliminar(id, conn);
+        }
     }
 
     @Override
@@ -123,12 +152,24 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
 
     @Override
     public void recuperar(int id, Connection conn) throws Exception {
+        String sql = "UPDATE fichaBibliografica SET eliminado = FALSE WHERE id = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            int result = stmt.executeUpdate();
+
+            if (result == 0) {
+                throw new Exception("La recuperación de la ficha " + id + " falló.");
+            }
+        }
 
     }
 
     @Override
     public void recuperar(int id) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            this.recuperar(id, conn);
+        }
     }
 
     // TODO: Ver si poner sentencia sql como constante y chequear que nombre de las columnas sean válidos

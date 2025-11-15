@@ -1,70 +1,201 @@
 package trabajo_integrador.dao;
 
 import trabajo_integrador.models.Libro;
+import trabajo_integrador.config.DatabaseConnection;
 
-import java.sql.Connection;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
+import trabajo_integrador.models.FichaBibliografica;
 
 public class LibroDAO implements GenericDAO<Libro> {
 
     @Override
     public void crear(Libro libro, Connection conn) throws Exception {
+        String sql = "INSERT INTO libro (titulo, autor, editorial, anioEdicion, id_ficha) VALUES (?,?,?,?,?) ";
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+            stmt.setString(1, libro.getTitulo());
+            stmt.setString(2, libro.getAutor());
+            stmt.setString(3, libro.getEditorial());
+            stmt.setInt(4, libro.getAnioEdicion());
+            if (libro.getFicha() != null && libro.getFicha().getId() > 0) {
+                stmt.setInt(5, libro.getFicha().getId());
+            } else {
+                stmt.setNull(4, java.sql.Types.INTEGER);
+            }
+            stmt.executeUpdate();
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    libro.setId(generatedKeys.getInt(1));
+                    System.out.println("Libro creado con ID: " + libro.getId());
+                } else {
+                    throw new Exception("La creación del libro falló. No se obtuvo el ID generado");
+                }
+            }
+        }
 
     }
 
     @Override
-    public void crear(Libro entidad) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void crear(Libro libro) throws Exception {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            this.crear(libro, conn);
+        }
     }
 
     @Override
     public void actualizar(Libro libro, Connection conn) throws Exception {
+        String sql = "UPDATE libro SET titulo = ?, autor = ?, editorial = ?, anioEdicion = ?, id_ficha = ? WHERE id_libro = ? AND eliminado = FALSE";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, libro.getTitulo());
+            stmt.setString(2, libro.getAutor());
+            stmt.setString(3, libro.getEditorial());
+            stmt.setInt(4, libro.getAnioEdicion());
+            if (libro.getFicha() != null && libro.getFicha().getId() > 0) {
+                stmt.setInt(5, libro.getFicha().getId());
+            } else {
+                stmt.setNull(5, java.sql.Types.INTEGER);
+            }
+            stmt.setInt(6, libro.getId());
+
+            int result = stmt.executeUpdate();
+
+            if (result == 0) {
+                throw new Exception("La actualizacion del libro " + libro.getId() + " falló.");
+            }
+        }
 
     }
 
     @Override
-    public void actualizar(Libro entidad) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void actualizar(Libro libro) throws Exception {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            this.actualizar(libro, conn);
+        }
     }
 
     @Override
     public void eliminar(int id, Connection conn) throws Exception {
+        String sql = "UPDATE libro SET eliminado = TRUE, id_ficha = NULL WHERE id_libro = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            int result = stmt.executeUpdate();
+
+            if (result == 0) {
+                throw new Exception("La eliminación del libro " + id + " falló.");
+            }
+        }
 
     }
 
     @Override
     public void eliminar(int id) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            this.eliminar(id, conn);
+        }
     }
 
     @Override
     public Libro leer(int id, Connection conn) throws Exception {
-        return new Libro();
+        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anioEdicion" + "f.id AS ficha_id, f.estante, f.isbn"
+                + "FROM libro l LEFT JOIN fichaBibliografica f ON l.id_ficha = f.id" + "WHERE l.id = ? and l.eliminado = FALSE";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Libro libro = new Libro();
+                    libro.setId(rs.getInt("id"));
+                    libro.setTitulo(rs.getString("titulo"));
+                    libro.setAutor(rs.getString("autor"));
+                    libro.setEditorial(rs.getString("editorial"));
+                    libro.setAnioEdicion(rs.getInt("anioEdicion"));
+
+                    int fichaId = rs.getInt("id_ficha");
+                    if (fichaId > 0 && !rs.wasNull()) {
+                        FichaBibliografica ficha = new FichaBibliografica();
+                        ficha.setId(rs.getInt("ficha_id"));
+                        ficha.setEstanteria(rs.getString("estante"));
+                        ficha.setIsbn(rs.getString("isbn"));
+                    }
+
+                    return libro;
+                }
+            }
+        }
+
+        return null;
     }
 
     @Override
     public Libro leer(int id) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            return this.leer(id, conn);
+        }
     }
 
     @Override
     public List<Libro> leerTodos(Connection conn) throws Exception {
-        return List.of();
+        List<Libro> libros = new ArrayList<>();
+
+        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anioEdicion" + "f.id AS ficha_id, f.estante, f.isbn"
+                + "FROM libro l LEFT JOIN fichaBibliografica f ON l.id_ficha = f.id" + "WHERE l.id = ? and l.eliminado = FALSE";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Libro libro = new Libro();
+                    libro.setId(rs.getInt("id"));
+                    libro.setTitulo(rs.getString("titulo"));
+                    libro.setAutor(rs.getString("autor"));
+                    libro.setEditorial(rs.getString("editorial"));
+                    libro.setAnioEdicion(rs.getInt("anioEdicion"));
+
+                    int fichaId = rs.getInt("id_ficha");
+                    if (fichaId > 0 && !rs.wasNull()) {
+                        FichaBibliografica ficha = new FichaBibliografica();
+                        ficha.setId(rs.getInt("ficha_id"));
+                        ficha.setEstanteria(rs.getString("estante"));
+                        ficha.setIsbn(rs.getString("isbn"));
+                    }
+                }
+            }
+
+            return libros;
+        }
     }
 
     @Override
     public List<Libro> leerTodos() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            return this.leerTodos(conn);
+        }
     }
 
     @Override
     public void recuperar(int id, Connection conn) throws Exception {
+        String sql = "UPDATE libro SET eliminado = FALSE, id_ficha = NULL WHERE id_libro = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            int result = stmt.executeUpdate();
+
+            if (result == 0) {
+                throw new Exception("La eliminación del libro " + id + " falló.");
+            }
+        }
 
     }
 
     @Override
     public void recuperar(int id) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            this.recuperar(id, conn);
+        }
     }
 
 }

@@ -24,10 +24,8 @@ public interface GenericDAO<T> {
     void eliminar(int id, Connection conn) throws Exception;
 
     void eliminar(int id) throws Exception;
-    //eliminar -- SET booleano de eliminado = true
 
     void recuperar(int id, Connection conn) throws Exception;
 
     void recuperar(int id) throws Exception;
-    // set booleano en false 
 }
