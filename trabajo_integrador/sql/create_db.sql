@@ -17,7 +17,7 @@ CREATE TABLE ficha_bibliografica (
 
 -- Tabla libro
 CREATE TABLE libro (
-   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+   id_libro BIGINT AUTO_INCREMENT PRIMARY KEY,
    eliminado BOOLEAN NOT NULL DEFAULT FALSE,
    titulo VARCHAR(150) NOT NULL,
    autor VARCHAR(120) NOT NULL,
