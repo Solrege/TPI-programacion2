@@ -25,7 +25,7 @@ CREATE TABLE libro (
    anio_edicion INT,
    id_ficha BIGINT UNIQUE, -- relación 1:1
    CONSTRAINT fk_libro_ficha FOREIGN KEY (id_ficha)
-       REFERENCES fichaBibliografica(id)
+       REFERENCES ficha_bibliografica(id)
        ON DELETE SET NULL
        ON UPDATE CASCADE
 );
