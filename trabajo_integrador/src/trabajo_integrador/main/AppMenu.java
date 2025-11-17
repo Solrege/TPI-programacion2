@@ -63,7 +63,7 @@ public class AppMenu {
             case 9 -> menuHandler.leerLibroPorId();
             case 10 -> menuHandler.leerFichaBibliograficaPorId();
 
-case 0 -> {
+            case 0 -> {
                 System.out.println("Saliendo...");
                 running = false;
             }
@@ -71,5 +71,4 @@ case 0 -> {
             default -> System.out.println("Opción no válida.");
         }
     }
-
 }

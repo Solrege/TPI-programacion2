@@ -8,7 +8,6 @@ import trabajo_integrador.config.DatabaseConnection;
 public class TestConnection {
     
     public static void main(String[] args) {
-        
         System.out.println("Intentando conectar a la base de datos...");
         
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -22,5 +21,4 @@ public class TestConnection {
             System.out.println(" Error en la conexión");
         }
     }
-
 }
