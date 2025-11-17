@@ -21,6 +21,26 @@ public class FichaBibliografica extends Base{
         this.estanteria = estanteria;
         this.idioma = idioma;
     }
+    
+    // Constructor simplificado SIN idioma (por defecto null)
+public FichaBibliografica(String isbn, String clasificadoDewey, String estanteria) {
+    super(0, false);
+    this.isbn = isbn;
+    this.clasificadoDewey = clasificadoDewey;
+    this.estanteria = estanteria;
+    this.idioma = null;
+}
+
+// Constructor simplificado CON idioma.
+// Se utiliza para crear una ficha nueva (id = 0) cuando el usuario ya seleccionó un idioma.
+// Es útil para instancias nuevas que aún no existen en base de datos.
+public FichaBibliografica(String isbn, String clasificadoDewey, String estanteria, Idioma idioma) {
+    super(0, false);
+    this.isbn = isbn;
+    this.clasificadoDewey = clasificadoDewey;
+    this.estanteria = estanteria;
+    this.idioma = idioma;
+}
 
     //GETTERS Y SETTERS
     public String getIsbn() {
