@@ -57,7 +57,7 @@ public class LibroService implements GenericService<Libro> {
                 try {
                     libroDAO.crear(libro, conn);
                 } catch (Exception e) {
-                    throw new Exception("Error al crear libro", e);
+                    throw new Exception("Error al crear libroDAO", e);
                 }
 
                 conn.commit();

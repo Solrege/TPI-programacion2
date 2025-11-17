@@ -12,10 +12,10 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
 
     @Override
     public void crear(FichaBibliografica fichaBibliografica, Connection conn) throws Exception {
-        String sql = "INSERT INTO fichaBibliografica (isbn,clasificadoDewey, estanteria, idioma) VALUES (?,?,?,?) ";
+        String sql = "INSERT INTO ficha_bibliografica (isbn,clasificacion_dewey, estanteria, idioma) VALUES (?,?,?,?) ";
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
             stmt.setString(1, fichaBibliografica.getIsbn());
-            stmt.setString(2, fichaBibliografica.getClasificadoDewey());
+            stmt.setString(2, fichaBibliografica.getClasificacionDewey());
             stmt.setString(3, fichaBibliografica.getEstanteria());
             stmt.setString(4, fichaBibliografica.getIdioma().name());
             stmt.executeUpdate();
@@ -41,11 +41,11 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
 
     @Override
     public void actualizar(FichaBibliografica fichaBibliografica, Connection conn) throws Exception {
-        String sql = "UPDATE fichaBibliografica SET isbn = ?, clasificadoDewey = ?, estanteria = ?, idioma = ? WHERE id = ? AND eliminado = FALSE";
+        String sql = "UPDATE ficha_bibliografica SET isbn = ?, clasificacion_dewey = ?, estanteria = ?, idioma = ? WHERE id = ? AND eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, fichaBibliografica.getIsbn());
-            stmt.setString(2, fichaBibliografica.getClasificadoDewey());
+            stmt.setString(2, fichaBibliografica.getClasificacionDewey());
             stmt.setString(3, fichaBibliografica.getEstanteria());
             stmt.setString(4, fichaBibliografica.getIdioma().name());
             stmt.setInt(5, fichaBibliografica.getId());
@@ -67,7 +67,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
 
     @Override
     public void eliminar(int id, Connection conn) throws Exception {
-        String sql = "UPDATE fichaBibliografica SET eliminado = TRUE WHERE id = ?";
+        String sql = "UPDATE ficha_bibliografica SET eliminado = TRUE WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -89,7 +89,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
 
     @Override
     public FichaBibliografica leer(int id, Connection conn) throws Exception {
-        String sql = "SELECT id, isbn, clasificadoDewey, estanteria, idioma FROM fichaBibliografica WHERE id = ? AND eliminado = FALSE";
+        String sql = "SELECT id, isbn, clasificacion_dewey, estanteria, idioma FROM ficha_bibliografica WHERE id = ? AND eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -99,7 +99,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
                     FichaBibliografica fichaBibliografica = new FichaBibliografica();
                     fichaBibliografica.setId(rs.getInt("id"));
                     fichaBibliografica.setIsbn(rs.getString("isbn"));
-                    fichaBibliografica.setClasificadoDewey(rs.getString("clasificadoDewey"));
+                    fichaBibliografica.setClasificacionDewey(rs.getString("clasificacion_dewey"));
                     fichaBibliografica.setEstanteria(rs.getString("estanteria"));
                     fichaBibliografica.setIdioma(Idioma.valueOf(rs.getString("idioma").toUpperCase()));
 
@@ -122,7 +122,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
     public List<FichaBibliografica> leerTodos(Connection conn) throws Exception {
         List<FichaBibliografica> fichas = new ArrayList<>();
 
-        String sql = "SELECT * FROM FichaBibliografica WHERE eliminado = FALSE";
+        String sql = "SELECT * FROM ficha_bibliografica WHERE eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
@@ -130,7 +130,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
                     FichaBibliografica fichaBibliografica = new FichaBibliografica();
                     fichaBibliografica.setId(rs.getInt("id"));
                     fichaBibliografica.setIsbn(rs.getString("isbn"));
-                    fichaBibliografica.setClasificadoDewey(rs.getString("clasificadoDewey"));
+                    fichaBibliografica.setClasificacionDewey(rs.getString("clasificacion_dewey"));
                     fichaBibliografica.setEstanteria(rs.getString("estanteria"));
                     fichaBibliografica.setIdioma(Idioma.valueOf(rs.getString("idioma").toUpperCase()));
                     fichas.add(fichaBibliografica);
@@ -150,7 +150,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
 
     @Override
     public void recuperar(int id, Connection conn) throws Exception {
-        String sql = "UPDATE fichaBibliografica SET eliminado = FALSE WHERE id = ?";
+        String sql = "UPDATE ficha_bibliografica SET eliminado = FALSE WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -172,7 +172,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
 
     // TODO: Ver si poner sentencia sql como constante y chequear que nombre de las columnas sean válidos
     public FichaBibliografica getByISBN(String isbn, Connection conn) throws SQLException {
-        String sql = "SELECT id, isbn, clasificacionDewey, estanteria FROM ficha_bibliografica WHERE isbn = ? AND eliminado = FALSE";
+        String sql = "SELECT id, isbn, clasificacion_dewey, estanteria, idioma FROM ficha_bibliografica WHERE isbn = ? AND eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, isbn);
@@ -182,7 +182,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
                     FichaBibliografica ficha = new FichaBibliografica();
                     ficha.setId(rs.getInt("id"));
                     ficha.setIsbn(rs.getString("isbn"));
-                    ficha.setClasificadoDewey(rs.getString("clasificacionDewey"));
+                    ficha.setClasificacionDewey(rs.getString("clasificacion_dewey"));
                     ficha.setEstanteria(rs.getString("estanteria"));
                     ficha.setIdioma(Idioma.valueOf(rs.getString("idioma")));
 
@@ -196,7 +196,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
 
     // TODO: Ver si poner sentencia sql como constante y chequear que nombre de la columna sea válido
     public boolean existeFichaAsociada(int idFicha, Connection conn) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM libro WHERE ficha_id = ? AND eliminado = FALSE";
+        String sql = "SELECT COUNT(*) FROM libro WHERE id_ficha = ? AND eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 

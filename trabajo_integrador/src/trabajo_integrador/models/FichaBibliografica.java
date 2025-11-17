@@ -3,7 +3,7 @@ package trabajo_integrador.models;
 
 public class FichaBibliografica extends Base{
     private String isbn;
-    private String clasificadoDewey;
+    private String clasificacionDewey;
     private String estanteria;
     private Idioma idioma;
 
@@ -14,19 +14,19 @@ public class FichaBibliografica extends Base{
     } 
 
 // Constructor completo 
-    public FichaBibliografica(int id, boolean eliminado, String isbn, String clasificadoDewey, String estanteria, Idioma idioma) {
+    public FichaBibliografica(int id, boolean eliminado, String isbn, String clasificacionDewey, String estanteria, Idioma idioma) {
         super(id, false);
         this.isbn = isbn;
-        this.clasificadoDewey = clasificadoDewey;
+        this.clasificacionDewey = clasificacionDewey;
         this.estanteria = estanteria;
         this.idioma = idioma;
     }
     
     // Constructor simplificado SIN idioma (por defecto null)
-public FichaBibliografica(String isbn, String clasificadoDewey, String estanteria) {
+public FichaBibliografica(String isbn, String clasificacionDewey, String estanteria) {
     super(0, false);
     this.isbn = isbn;
-    this.clasificadoDewey = clasificadoDewey;
+    this.clasificacionDewey = clasificacionDewey;
     this.estanteria = estanteria;
     this.idioma = null;
 }
@@ -34,10 +34,10 @@ public FichaBibliografica(String isbn, String clasificadoDewey, String estanteri
 // Constructor simplificado CON idioma.
 // Se utiliza para crear una ficha nueva (id = 0) cuando el usuario ya seleccionó un idioma.
 // Es útil para instancias nuevas que aún no existen en base de datos.
-public FichaBibliografica(String isbn, String clasificadoDewey, String estanteria, Idioma idioma) {
+public FichaBibliografica(String isbn, String clasificacionDewey, String estanteria, Idioma idioma) {
     super(0, false);
     this.isbn = isbn;
-    this.clasificadoDewey = clasificadoDewey;
+    this.clasificacionDewey = clasificacionDewey;
     this.estanteria = estanteria;
     this.idioma = idioma;
 }
@@ -51,12 +51,12 @@ public FichaBibliografica(String isbn, String clasificadoDewey, String estanteri
        this.isbn = isbn;
    }
 
-    public String getClasificadoDewey() {
-       return clasificadoDewey;
+    public String getClasificacionDewey() {
+       return clasificacionDewey;
     }
 
-    public void setClasificadoDewey(String clasificadoDewey) {
-       this.clasificadoDewey = clasificadoDewey;
+    public void setClasificacionDewey(String clasificacionDewey) {
+       this.clasificacionDewey = clasificacionDewey;
     }
 
     public String getEstanteria() {
@@ -82,7 +82,7 @@ public FichaBibliografica(String isbn, String clasificadoDewey, String estanteri
         System.out.println("=== Ficha Bibliográfica ===");
         System.out.println("Id: " + getId());
         System.out.println("ISBN: " + isbn);
-        System.out.println("Clasificación Dewey: " + clasificadoDewey);
+        System.out.println("Clasificación Dewey: " + clasificacionDewey);
         System.out.println("Estantería: " + estanteria);
         System.out.println("Idioma: " + idioma);
         System.out.println("Eliminado: " + isEliminado());
@@ -93,7 +93,7 @@ public FichaBibliografica(String isbn, String clasificadoDewey, String estanteri
             return "FichaBibliografica{" +
                     "id=" + getId() +
                     "isbn=" + isbn +
-                    ", clasificadoDewey="+ clasificadoDewey +
+                    ", clasificacionDewey="+ clasificacionDewey +
                     ", estanteria=" + estanteria +
                     ", idioma=" + idioma +
                     ", eliminado=" + isEliminado() +

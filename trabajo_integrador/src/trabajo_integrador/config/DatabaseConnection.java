@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/tpi_bd";
+    private static final String URL = "jdbc:mysql://localhost:3308/tpi_bd";
     private static final String USER = "root";
-    private static final String PASSWORD = "9]~b}rTLqv";
+    private static final String PASSWORD = "test";
 
     static {
         try {

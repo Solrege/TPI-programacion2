@@ -97,7 +97,7 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
             throw new IllegalArgumentException("EL ISBN excede la cantidad de caracteres (17)");
         }
 
-        if (ficha.getClasificadoDewey().length() > 20) {
+        if (ficha.getClasificacionDewey().length() > 20) {
             throw new IllegalArgumentException("El Clasificado de dewey excede la cantidad de caracteres (20).");
         }
 

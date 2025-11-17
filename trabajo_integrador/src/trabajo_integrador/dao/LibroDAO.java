@@ -12,7 +12,7 @@ public class LibroDAO implements GenericDAO<Libro> {
 
     @Override
     public void crear(Libro libro, Connection conn) throws Exception {
-        String sql = "INSERT INTO libro (titulo, autor, editorial, anioEdicion, id_ficha) VALUES (?,?,?,?,?) ";
+        String sql = "INSERT INTO libro (titulo, autor, editorial, anio_edicion, id_ficha) VALUES (?,?,?,?,?) ";
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
             stmt.setString(1, libro.getTitulo());
             stmt.setString(2, libro.getAutor());
@@ -21,7 +21,7 @@ public class LibroDAO implements GenericDAO<Libro> {
             if (libro.getFicha() != null && libro.getFicha().getId() > 0) {
                 stmt.setInt(5, libro.getFicha().getId());
             } else {
-                stmt.setNull(4, java.sql.Types.INTEGER);
+                stmt.setNull(5, java.sql.Types.INTEGER);
             }
             stmt.executeUpdate();
 
@@ -46,7 +46,7 @@ public class LibroDAO implements GenericDAO<Libro> {
 
     @Override
     public void actualizar(Libro libro, Connection conn) throws Exception {
-        String sql = "UPDATE libro SET titulo = ?, autor = ?, editorial = ?, anioEdicion = ?, id_ficha = ? WHERE id_libro = ? AND eliminado = FALSE";
+        String sql = "UPDATE libro SET titulo = ?, autor = ?, editorial = ?, anio_edicion = ?, id_ficha = ? WHERE id_libro = ? AND eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, libro.getTitulo());
@@ -100,7 +100,7 @@ public class LibroDAO implements GenericDAO<Libro> {
 
     @Override
     public Libro leer(int id, Connection conn) throws Exception {
-        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anioEdicion, f.id AS ficha_id, f.estanteria, f.isbn FROM libro l LEFT JOIN FichaBibliografica f ON l.id_ficha = f.id WHERE l.id_libro = ? AND l.eliminado = FALSE";
+        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anio_edicion, f.id AS ficha_id, f.estanteria, f.isbn FROM libro l LEFT JOIN ficha_bibliografica f ON l.id_ficha = f.id WHERE l.id_libro = ? AND l.eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -112,7 +112,7 @@ public class LibroDAO implements GenericDAO<Libro> {
                     libro.setTitulo(rs.getString("titulo"));
                     libro.setAutor(rs.getString("autor"));
                     libro.setEditorial(rs.getString("editorial"));
-                    libro.setAnioEdicion(rs.getInt("anioEdicion"));
+                    libro.setAnioEdicion(rs.getInt("anio_edicion"));
 
                     int fichaId = rs.getInt("ficha_id");
                     if (fichaId > 0 && !rs.wasNull()) {
@@ -141,7 +141,7 @@ public class LibroDAO implements GenericDAO<Libro> {
     public List<Libro> leerTodos(Connection conn) throws Exception {
         List<Libro> libros = new ArrayList<>();
 
-        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anioEdicion, f.id AS ficha_id, f.estanteria, f.isbn FROM libro l LEFT JOIN FichaBibliografica f ON l.id_ficha = f.id WHERE l.eliminado = FALSE";
+        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anio_edicion, f.id AS ficha_id, f.estanteria, f.isbn FROM libro l LEFT JOIN ficha_bibliografica f ON l.id_ficha = f.id WHERE l.eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
@@ -151,7 +151,7 @@ public class LibroDAO implements GenericDAO<Libro> {
                     libro.setTitulo(rs.getString("titulo"));
                     libro.setAutor(rs.getString("autor"));
                     libro.setEditorial(rs.getString("editorial"));
-                    libro.setAnioEdicion(rs.getInt("anioEdicion"));
+                    libro.setAnioEdicion(rs.getInt("anio_edicion"));
 
                     int fichaId = rs.getInt("ficha_id");
                     if (!rs.wasNull()) {

@@ -274,7 +274,7 @@ public class MenuHandler {
 
         FichaBibliografica ficha = new FichaBibliografica();
         ficha.setIsbn(isbn);
-        ficha.setClasificadoDewey(clasificadoDewey);
+        ficha.setClasificacionDewey(clasificadoDewey);
         ficha.setEstanteria(estanteria);
         ficha.setIdioma(idioma);
 
@@ -304,7 +304,7 @@ public class MenuHandler {
             }
 
             for (FichaBibliografica f : fichas) {
-             System.out.println("ID: " + f.getId() + " | ISBN: " + f.getIsbn() +" | Dewey: " + f.getClasificadoDewey() +" | Estantería: " + f.                         getEstanteria() + " | Idioma: " + f.getIdioma());
+             System.out.println("ID: " + f.getId() + " | ISBN: " + f.getIsbn() +" | Dewey: " + f.getClasificacionDewey() +" | Estantería: " + f.                         getEstanteria() + " | Idioma: " + f.getIdioma());
             }
         } catch (Exception e) {
             System.err.println("Error al listar fichas: " + e.getMessage());
@@ -334,9 +334,9 @@ public class MenuHandler {
             String isbn = scanner.nextLine().trim();
             if (!isbn.isEmpty()) ficha.setIsbn(isbn);
 
-            System.out.print("Nuevo Clasificado Dewey (" + ficha.getClasificadoDewey() + "): ");
+            System.out.print("Nuevo Clasificado Dewey (" + ficha.getClasificacionDewey() + "): ");
             String dewey = scanner.nextLine().trim();
-            if (!dewey.isEmpty()) ficha.setClasificadoDewey(dewey);
+            if (!dewey.isEmpty()) ficha.setClasificacionDewey(dewey);
 
             System.out.print("Nueva Estantería (" + ficha.getEstanteria() + "): ");
             String estanteria = scanner.nextLine().trim();
@@ -430,7 +430,7 @@ public class MenuHandler {
                 System.out.println("Ficha Bibliográfica Asociada:");
                 System.out.println(" - Ficha ID: " + libro.getFicha().getId());
                 System.out.println(" - ISBN: " + libro.getFicha().getIsbn());
-                System.out.println(" - Dewey: " + libro.getFicha().getClasificadoDewey());
+                System.out.println(" - Dewey: " + libro.getFicha().getClasificacionDewey());
                 System.out.println(" - Estantería: " + libro.getFicha().getEstanteria());
                 System.out.println(" - Idioma: " + libro.getFicha().getIdioma());
             } else {
@@ -460,7 +460,7 @@ public class MenuHandler {
             System.out.println("--- Ficha Encontrada ---");
             System.out.println("ID: " + ficha.getId());
             System.out.println("ISBN: " + ficha.getIsbn());
-            System.out.println("Clasificado Dewey: " + ficha.getClasificadoDewey());
+            System.out.println("Clasificado Dewey: " + ficha.getClasificacionDewey());
             System.out.println("Estantería: " + ficha.getEstanteria());
             System.out.println("Idioma: " + ficha.getIdioma());
 
