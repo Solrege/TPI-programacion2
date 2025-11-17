@@ -13,6 +13,10 @@ public class Principal {
        Libro l1 = new Libro(1, false, "Fundamentos de Base de Datos", "Elmasri & Navathe", "Pearson", 2220);
        //l1.setFicha(ficha);
        l1.mostrarDatos();
+
+        AppMenu menu = new AppMenu();
+        menu.run();
+
     }
 
 }
