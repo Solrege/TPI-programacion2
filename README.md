@@ -208,7 +208,35 @@ Este script lo que hace es insertar todos los datos iniciales en las tablas prev
 
 
 
+USE tpi\_bd;
 
+
+
+-- Insertar fichas bibliográficas
+
+INSERT INTO ficha\_bibliografica (isbn, clasificacion\_Dewey, estanteria, idioma) VALUES
+
+&nbsp;   ('978-84-376-0494-7','863.64','A1','es'),
+
+&nbsp;   ('978-950-02-0001-8','861.64','A2','es'),
+
+&nbsp;   ('978-0134670942','005.13','B1','en');
+
+
+
+-- Insertar libros con referencia a la ficha (1:1)
+
+INSERT INTO libro (titulo, autor, editorial, anio\_edicion, id\_ficha) VALUES
+
+&nbsp;   ('Cien Años de Soledad','Gabriel García Márquez','Sudamericana',1967, 1),
+
+&nbsp;   ('El Aleph','Jorge Luis Borges','Sur',1949, 2),
+
+&nbsp;   ('Java: Cómo Programar','Deitel','Prentice Hall',2018, 3);
+
+&nbsp;   
+
+&nbsp;   SELECT COUNT(\*) FROM ficha\_bibliografica; 
 
 
 
@@ -232,97 +260,210 @@ Configuración de la conexión (DatabaseConnection)
 
 
 
-Para configurar la conexión con la base de datos, es necesario abrir el archivo \[DatabaseConnection.java] ubicado en (https://github.com/Solrege/TPI-programacion2/blob/main/trabajo\_integrador/src/trabajo\_integrador/config/DatabaseConnection.java), lo ideal es realizarlo desde un IDE como NetBeans
+Para configurar la conexión con la base de datos, es necesario abrir el archivo clase \[DatabaseConnection.java] ubicado en (https://github.com/Solrege/TPI-programacion2/blob/main/trabajo\_integrador/src/trabajo\_integrador/config/DatabaseConnection.java), lo ideal es realizarlo desde un IDE como NetBeans, cargar el proyecto
+
+y luego abrir el paquete config en donde se encuentra ubicado el archivo. Se debe tener en cuenta que establece la conexión entre el sistema y la base cargando también previamente
+
+la versión del Driver de JDBC de MySQL, éste se carga desde Libraries --> Add Jar/Folder --> mysql-connector-j-8.4.0.jar
+
+Al ejecutarl el código, valida que la url sea la de por defecto "localhost:3306", el usuario y la contraseña sean correctos, dependiendo en qué computadora se ejecutan, sino modificarlos.
+
+
+
+\*\*\*\*package trabajo\_integrador.config;
+
+
+
+import java.sql.Connection;
+
+import java.sql.DriverManager;
+
+import java.sql.SQLException;
+
+
+
+public class DatabaseConnection {
+
+
+
+&nbsp;   private static final String URL = "jdbc:mysql://localhost:3308/tpi\_bd";
+
+&nbsp;   private static final String USER = "root";
+
+&nbsp;   private static final String PASSWORD = "test";
+
+
+
+&nbsp;   static {
+
+&nbsp;       try {
+
+&nbsp;           Class.forName("com.mysql.cj.jdbc.Driver");
+
+&nbsp;       } catch (ClassNotFoundException e) {
+
+&nbsp;           throw new RuntimeException("Error: No se encontró el driver JDBC.", e);
+
+&nbsp;       }
+
+&nbsp;   }
+
+
+
+&nbsp;   public static Connection getConnection() throws SQLException {
+
+&nbsp;       if (URL == null || URL.isEmpty() || USER == null || USER.isEmpty() || PASSWORD == null || PASSWORD.isEmpty()) {
+
+&nbsp;           throw new SQLException("Configuración de la base de datos incompleta o inválida.");
+
+&nbsp;       }
+
+&nbsp;       return DriverManager.getConnection(URL, USER, PASSWORD);
+
+&nbsp;   }
+
+}
+
+
+
+\*\*\*\*\*
+
+El objetivo es que cualquier DAO pueda obtener una conexión simplemente llamando: Connection conn = DatabaseConnection.getConnection();
 
 
 
 
 
+------------------------------------------------------------------------------------
+
+Probar la conexión (TestConnection)
+
+------------------------------------------------------------------------------------
+
+
+
+Con éste archivo que se ubica en el main\[TestConnection.java],ubicado en el repositorio (https://github.com/Solrege/TPI-programacion2/blob/main/trabajo\_integrador/src/trabajo\_integrador/main/TestConnection.java) 
+
+se debe ejecutar y si muestra el mensaje ¡Conexión a la BBDD exitosa!, se estableció la conexión, de lo contrario devuelve Error en la conexión.
+
+
+
+package trabajo\_integrador.main;
+
+
+
+import java.sql.Connection;
+
+import java.sql.SQLException;
+
+import trabajo\_integrador.config.DatabaseConnection;
 
 
 
 
 
+public class TestConnection {
+
+&nbsp;   
+
+&nbsp;   public static void main(String\[] args) {
+
+&nbsp;       System.out.println("Intentando conectar a la base de datos...");
+
+&nbsp;       
+
+&nbsp;       try (Connection conn = DatabaseConnection.getConnection()) {
+
+&nbsp;           
+
+&nbsp;           if (conn != null) {
+
+&nbsp;               System.out.println("¡Conexión a la BBDD exitosa!");
+
+&nbsp;               System.out.println("AutoCommit: " + conn.getAutoCommit());
+
+&nbsp;           }
+
+&nbsp;           
+
+&nbsp;       } catch (SQLException e) {
+
+&nbsp;           System.out.println(" Error en la conexión");
+
+&nbsp;       }
+
+&nbsp;   }
+
+}
 
 
 
 
 
+--------------------------------------------------------------------------------------------------------------
 
+Ejecutar el Sistema Completo
 
----
-
-▪ Cómo compilar y ejecutar (credenciales de prueba y flujo de uso).
-
----
-
-
-
-
-
-Cómo compilar y ejecutar
-
-Configuración de credenciales de base de datos:
-
-
-
-Antes de ejecutar la aplicación, debes configurar las credenciales de conexión a MySQL en la clase DatabaseConnection:
-
-
-
-Ubicación: Config/DatabaseConnection.java
-
-
-
-javaprivate static final String URL = "jdbc:mysql://localhost:3306/tpi\_bd";
-
-
-
-private static final String USER = "tu\_usuario";
-
-
-
-private static final String PASSWORD = "tu\_contraseña";
-
-
-
-
-
------------------------------------------------------------------------
-
-Compilación y ejecución
-
-&nbsp;Desde el IDE (recomendado)
-
-
+--------------------------------------------------------------------------------------------------------------
 
 Abrir el proyecto en tu IDE (IntelliJ IDEA, NetBeans, Eclipse), nosotras utilizamos NetBeans
 
 Hay que asegurarse de tener el driver JDBC de MySQL en el classpath del proyecto
 
-Ejecuta la clase principal: Main.Principal.java
 
 
 
-\### Flujo de uso de la aplicación
+
+El archivo principal es \[Principal.Java] ubicado en el main. Es el punto de entrada del sistema y el lo primero que se eje
+
+Su funcion es inicializar objetos básicos (Libro y ficha\_bibliografica), mostrar un ejemplo simple por consola e iniciar un menú interactivo del sistema.
+
+Pasos a seguir:
 
 
 
-Al ejecutar la aplicación, se mostrará el menú principal con las siguientes opciones:
+1\. Ejecutar `create\_db.sql`  
+
+2\. Ejecutar `seed\_data.sql`  
+
+3\. Configurar DatabaseConnection.java  
+
+4\. Ejecutar `Principal.java`  
+
+5\. Navegar con el menú por consola  
 
 
 
-\#### \*\*Menú Principal\*\*
+Funcionalidades del Sistema
 
-```
 
-======================================
 
-&nbsp;  SISTEMA BIBLIOTECARIO
+\- Crear libros  
 
-======================================
+\- Crear fichas bibliográficas  
 
-&nbsp;MEN PRINCIPAL        
+\- Relacionar fichas con libros (1→1)  
+
+\- Listar  
+
+\- Actualizar  
+
+\- Baja lógica  
+
+\- Integración DAO + Service 
+
+
+
+
+
+Ejemplo de Menú:
+=====================================
+
+&nbsp;        SISTEMA BIBLIOTECARIO       
+
+=====================================
+
+&nbsp;              MEN PRINCIPAL        
 
 -------------------------------------
 
@@ -358,179 +499,41 @@ Al ejecutar la aplicación, se mostrará el menú principal con las siguientes o
 
 
 
-Seleccione una opción: 
+Seleccione una opción: 1
 
+=== Crear Libro ===
 
+Título: Cien años de Soledad
 
-\### \*\*Primera Sección\*\*
-
-
-
-Permite gestionar los libros del sistema:
-
-
-
-1 - \*\*Crear libro:\*\* Solicita título, autor, año de publicación y género
-
-2 - \*\*Listar libros:\*\* Muestra todos los libros activos en el sistema
-
-3- \*\*Actualizar libro:\*\* Modifica los datos de un libro existente
-
-4- \*\*Eliminar libro:\*\* Realiza una baja lógica del libro
-
-
-
-\*\*Ejemplo de creación de libro:\*\*
-
-```
-
-Título: Cien años de soledad
-
-Autor: Gabriel García Márquez
+Autor: Gabriel Garcia Marquez
 
 Editorial: Sudamericana
 
-Año Edicion: 1967
+Año edición: 1967
 
+Debe crear una Ficha Bibliogrfica para este libro.
 
+=== Crear Ficha Bibliogrfica ===
 
-```
+ISBN: 1
 
+Clasificado Dewey: 863.64
 
+Estantería: A1
 
-\#### \*\*Segunda Sección\*\*
+Idiomas disponibles:
 
+1\. ESPAOL
 
+2\. INGLES
 
-Gestiona la información bibliográfica detallada:
+3\. FRANCES
 
+4\. PORTUGUES
 
+5\. OTRO
 
-1- \*\*Crear Ficha Bibliográfica:\*\* Solicita editorial, ISBN, idioma, número de páginas y sinopsis
-
-2- \*\*Listar fichas:\*\* Muestra todas las fichas activas
-
-\- \*\*Ver ficha por ID:\*\* Busca y muestra una ficha específica
-
-3- \*\*Actualizar ficha:\*\* Modifica los datos de una ficha existente
-
--4 \*\*Eliminar ficha:\*\* Elimina la ficha del sistema
-
-
-
-\*\*Ejemplo de creación de ficha:\*\*
-
-```
-
-Editorial: Sudamericana
-
-ISBN: 978-0307474728
-
-Idioma: Español
-
-Número de páginas: 496
-
-Sinopsis: La historia de la familia Buendía...
-
-```
-
-
-
-\#### \*\*3. Buscar libro por ISBN\*\*
-
-
-
-Permite buscar un libro específico ingresando su código ISBN. El sistema buscará en las fichas bibliográficas asociadas.
-
-
-
-\*\*Ejemplo:\*\*
-
-```
-
-ISBN: 978-0307474728
-
-```
-
-
-
-\#### \*\*4. Buscar libro por título\*\*
-
-
-
-Realiza una búsqueda flexible por título (coincidencia parcial, no sensible a mayúsculas).
-
-
-
-\*\*Ejemplo:\*\*
-
-```
-
-Título (o parte): años
-
-\# Encontrará "Cien años de soledad"
-
-```
-
-5\. Probar rollback (error simulado)
-
-Función de demostración que muestra el funcionamiento del sistema de transacciones:
-
-
-
-Intenta insertar un libro
-
-Fuerza un error intencionalmente
-
-Demuestra que la transacción se revierte correctamente
-
-Verifica que el libro NO quedó guardado en la base de datos
-
-
-
-Validaciones implementadas
-
-El sistema implementa las siguientes validaciones automáticas:
-
-Libros:
-
-
-
-Título y autor son obligatorios
-
-Año de publicación debe ser positivo
-
-No se puede eliminar un libro con ficha bibliográfica asociada
-
-
-
-Fichas Bibliográficas:
-
-
-
-Editorial, ISBN e idioma son obligatorios
-
-ISBN debe ser único en el sistema
-
-Número de páginas debe ser positivo (si se proporciona)
-
-
-
-Manejo de transacciones
-
-Todas las operaciones de escritura (crear, actualizar, eliminar) utilizan transacciones mediante TransactionManager:
-
-
-
-Si la operación es exitosa: se confirma con commit()
-
-Si ocurre un error: se revierte automáticamente con rollback()
-
-
-
-Esto garantiza la integridad de los datos en todo momento.
-
-
+Seleccione idioma: 1
 
 --------------------------------------------------------------------------
 
