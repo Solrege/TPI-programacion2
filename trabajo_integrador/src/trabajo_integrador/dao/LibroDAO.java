@@ -1,5 +1,6 @@
 package trabajo_integrador.dao;
 
+import trabajo_integrador.models.Idioma;
 import trabajo_integrador.models.Libro;
 import trabajo_integrador.config.DatabaseConnection;
 
@@ -100,7 +101,7 @@ public class LibroDAO implements GenericDAO<Libro> {
 
     @Override
     public Libro leer(int id, Connection conn) throws Exception {
-        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anio_edicion, f.id AS ficha_id, f.estanteria, f.isbn FROM libro l LEFT JOIN ficha_bibliografica f ON l.id_ficha = f.id WHERE l.id_libro = ? AND l.eliminado = FALSE";
+        String sql = "SELECT l.id_libro, l.titulo, l.autor, l.editorial, l.anio_edicion, f.id AS ficha_id, f.estanteria, f.isbn, f.clasificacion_dewey, f.idioma FROM libro l LEFT JOIN ficha_bibliografica f ON l.id_ficha = f.id WHERE l.id_libro = ? AND l.eliminado = FALSE";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -120,6 +121,10 @@ public class LibroDAO implements GenericDAO<Libro> {
                         ficha.setId(rs.getInt("ficha_id"));
                         ficha.setEstanteria(rs.getString("estanteria"));
                         ficha.setIsbn(rs.getString("isbn"));
+                        ficha.setClasificacionDewey(rs.getString("clasificacion_dewey"));
+                        ficha.setIdioma(Idioma.valueOf(rs.getString("idioma")));
+
+                        libro.setFicha(ficha);
                     }
 
                     return libro;

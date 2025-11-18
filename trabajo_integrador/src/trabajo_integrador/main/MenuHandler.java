@@ -29,7 +29,6 @@ public class MenuHandler {
         this.fichaBibliograficaService = fichaBibliograficaService;
     }
 
-
     // --- MÉTODOS DE VALIDACIÓN  ---
     public int leerAnioEdicion() {
         int anioEdicion;
@@ -56,8 +55,7 @@ public class MenuHandler {
         }
     }
 
-
-//Metodo CRUD: Libro
+    //Metodo CRUD: Libro
 
     //Crear Libro
     public void crearLibro() {
@@ -79,12 +77,6 @@ public class MenuHandler {
             System.out.println("Debe crear una Ficha Bibliográfica para este libro.");
            FichaBibliografica ficha = crearFicha();
                    // nunca debe retornar null
-
-            if (ficha == null) {
-                System.err.println("Error: No se pudo crear la ficha. Libro cancelado.");
-
-                return;
-            }
 
             Libro libro = new Libro(titulo, autor, editorial, anioEdicion, ficha);
 
@@ -137,46 +129,46 @@ public class MenuHandler {
                 return;
             }
 
-        System.out.print("Nuevo título (actual: " + l.getTitulo() + "): ");
-        String titulo = scanner.nextLine().trim();
-        if (!titulo.isEmpty()) l.setTitulo(titulo);
+            System.out.print("Nuevo título (actual: " + l.getTitulo() + "): ");
+            String titulo = scanner.nextLine().trim();
+            if (!titulo.isEmpty()) l.setTitulo(titulo);
 
-        System.out.print("Nuevo autor (actual: " + l.getAutor() + "): ");
-        String autor = scanner.nextLine().trim();
-        if (!autor.isEmpty()) l.setAutor(autor);
+            System.out.print("Nuevo autor (actual: " + l.getAutor() + "): ");
+            String autor = scanner.nextLine().trim();
+            if (!autor.isEmpty()) l.setAutor(autor);
 
-        System.out.print("Nueva editorial (actual: " + l.getEditorial() + "): ");
-        String editorial = scanner.nextLine().trim();
-        if (!editorial.isEmpty()) l.setEditorial(editorial);
+            System.out.print("Nueva editorial (actual: " + l.getEditorial() + "): ");
+            String editorial = scanner.nextLine().trim();
+            if (!editorial.isEmpty()) l.setEditorial(editorial);
 
-        System.out.print("Nuevo año (actual: " + l.getAnioEdicion() + "): ");
-        String anioStr = scanner.nextLine().trim();
-        if (!anioStr.isEmpty()) {
-            try {
-                l.setAnioEdicion(Integer.parseInt(anioStr));
-            } catch (Exception ignored) {}
-        }
-
-        System.out.println("¿Desea reemplazar la ficha bibliográfica? (s/n): ");
-        if (scanner.nextLine().trim().equalsIgnoreCase("s")) {
-
-            System.out.println("Debe elegir una nueva ficha para reemplazar:");
-            listarFichasBibliograficas();
-
-            System.out.print("ID nueva ficha: ");
-            int idFicha = Integer.parseInt(scanner.nextLine());
-
-            FichaBibliografica nueva = fichaBibliograficaService.getById(idFicha);
-
-            if (nueva == null) {
-                System.out.println("Ficha no encontrada. No se modificará.");
-            } else {
-                l.setFicha(nueva);
+            System.out.print("Nuevo año (actual: " + l.getAnioEdicion() + "): ");
+            String anioStr = scanner.nextLine().trim();
+            if (!anioStr.isEmpty()) {
+                try {
+                    l.setAnioEdicion(Integer.parseInt(anioStr));
+                } catch (Exception ignored) {}
             }
-        }
 
-        libroService.actualizar(l);
-        System.out.println("Libro actualizado exitosamente.");
+            System.out.println("¿Desea reemplazar la ficha bibliográfica? (s/n): ");
+            if (scanner.nextLine().trim().equalsIgnoreCase("s")) {
+
+                System.out.println("Debe elegir una nueva ficha para reemplazar:");
+                listarFichasBibliograficas();
+
+                System.out.print("ID nueva ficha: ");
+                int idFicha = Integer.parseInt(scanner.nextLine());
+
+                FichaBibliografica nueva = fichaBibliograficaService.getById(idFicha);
+
+                if (nueva == null) {
+                    System.out.println("Ficha no encontrada. No se modificará.");
+                } else {
+                    l.setFicha(nueva);
+                }
+            }
+
+            libroService.actualizar(l);
+            System.out.println("Libro actualizado exitosamente.");
 
         } catch (Exception e) {
             System.err.println("Error al actualizar libro: " + e.getMessage());
@@ -191,6 +183,17 @@ public class MenuHandler {
             
             System.out.print("ID del libro a eliminar: ");
             int id = Integer.parseInt(scanner.nextLine());
+
+            // Confirmación
+            System.out.print("¿Está seguro que desea eliminarla? (S/N): ");
+            String confirmacion = scanner.nextLine().trim().toUpperCase();
+
+            if (!confirmacion.equals("S")) {
+                System.out.println("Operación cancelada.");
+
+                return;
+            }
+
             libroService.eliminar(id);
             System.out.println("Libro eliminado exitosamente.");
         } catch (Exception e) {
@@ -198,61 +201,15 @@ public class MenuHandler {
         }
     }
 
-    
-//Metodos CRUD: FichaBibliografica:
- 
-    //Crear Ficha
-    
-   public void crearFichaBibliografica(){
+    //Metodos CRUD: FichaBibliografica:
+
+    // Crea entidad ficha y la persiste
+    public void crearFichaBibliografica(){
        FichaBibliografica ficha = crearFicha();
        persistirFicha(ficha);   
    }
-    
-    
-    
-    
-//    public void crearFichaBibliografica() {
-//        try {
-//            System.out.println("=== Crear Ficha Bibliográfica ===");
-//
-//            System.out.print("ISBN: ");
-//            String isbn = scanner.nextLine().trim();
-//
-//            System.out.print("Clasificado Dewey: ");
-//            String clasificadoDewey = scanner.nextLine().trim();
-//
-//            System.out.print("Estantería: ");
-//            String estanteria = scanner.nextLine().trim();
-//
-//            System.out.println("Seleccione el idioma:");
-//            int i = 1;
-//            for (Idioma idioma : Idioma.values()) {
-//                System.out.println(i++ + ". " + idioma);
-//            }
-//            System.out.print("Opción: ");
-//            int opcionIdioma = Integer.parseInt(scanner.nextLine());
-//
-//            Idioma idiomaSeleccionado = Idioma.values()[opcionIdioma - 1];
-//
-//            // Crear ficha
-//            FichaBibliografica ficha = new FichaBibliografica(
-//                isbn,
-//                clasificadoDewey,
-//                estanteria
-//            );
-//            ficha.setIdioma(idiomaSeleccionado);
-//
-//            fichaBibliograficaService.insertar(ficha);
-//
-//            System.out.println("Ficha creada con éxito. ID: " + ficha.getId());
-//
-//        } catch (Exception e) {
-//            System.err.println("Error al crear ficha bibliográfica: " + e.getMessage());
-//        }
-//    }
 
-//Crear ficha desde la creacion de Libro
-    
+    //Crea solo entidad ficha
     private FichaBibliografica crearFicha() {
         System.out.println("=== Crear Ficha Bibliográfica ===");
 
@@ -291,7 +248,7 @@ public class MenuHandler {
         return ficha;
     }
     
-    public void persistirFicha(FichaBibliografica ficha){
+    private void persistirFicha(FichaBibliografica ficha){
         try {
             fichaBibliograficaService.insertar(ficha);
 
@@ -299,8 +256,6 @@ public class MenuHandler {
             System.err.println("Error al crear ficha: " + e.getMessage());
         }
     }
-    
-    
 
     //Listar fichas:
     public void listarFichasBibliograficas() {
@@ -377,7 +332,6 @@ public class MenuHandler {
         }
     }
 
-    
     //Eliminar ficha:
     public void eliminarFichaBibliografica() {
         try {
