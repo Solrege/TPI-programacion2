@@ -8,7 +8,8 @@ public class DatabaseConnection {
 
     private static final String URL = "jdbc:mysql://localhost:3308/tpi_bd";
     private static final String USER = "root";
-    private static final String PASSWORD = "test";
+    private static final String PASSWORD = "12345";
+
 
     static {
         try {

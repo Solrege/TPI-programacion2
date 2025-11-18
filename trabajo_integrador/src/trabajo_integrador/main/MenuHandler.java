@@ -77,7 +77,8 @@ public class MenuHandler {
 
             // FICHA OBLIGATORIA
             System.out.println("Debe crear una Ficha Bibliográfica para este libro.");
-            FichaBibliografica ficha = crearFicha();  // nunca debe retornar null
+           FichaBibliografica ficha = crearFicha();
+                   // nunca debe retornar null
 
             if (ficha == null) {
                 System.err.println("Error: No se pudo crear la ficha. Libro cancelado.");
@@ -201,45 +202,54 @@ public class MenuHandler {
 //Metodos CRUD: FichaBibliografica:
  
     //Crear Ficha
-    public void crearFichaBibliografica() {
-        try {
-            System.out.println("=== Crear Ficha Bibliográfica ===");
-
-            System.out.print("ISBN: ");
-            String isbn = scanner.nextLine().trim();
-
-            System.out.print("Clasificado Dewey: ");
-            String clasificadoDewey = scanner.nextLine().trim();
-
-            System.out.print("Estantería: ");
-            String estanteria = scanner.nextLine().trim();
-
-            System.out.println("Seleccione el idioma:");
-            int i = 1;
-            for (Idioma idioma : Idioma.values()) {
-                System.out.println(i++ + ". " + idioma);
-            }
-            System.out.print("Opción: ");
-            int opcionIdioma = Integer.parseInt(scanner.nextLine());
-
-            Idioma idiomaSeleccionado = Idioma.values()[opcionIdioma - 1];
-
-            // Crear ficha
-            FichaBibliografica ficha = new FichaBibliografica(
-                isbn,
-                clasificadoDewey,
-                estanteria
-            );
-            ficha.setIdioma(idiomaSeleccionado);
-
-            fichaBibliograficaService.insertar(ficha);
-
-            System.out.println("Ficha creada con éxito. ID: " + ficha.getId());
-
-        } catch (Exception e) {
-            System.err.println("Error al crear ficha bibliográfica: " + e.getMessage());
-        }
-    }
+    
+   public void crearFichaBibliografica(){
+       FichaBibliografica ficha = crearFicha();
+       persistirFicha(ficha);   
+   }
+    
+    
+    
+    
+//    public void crearFichaBibliografica() {
+//        try {
+//            System.out.println("=== Crear Ficha Bibliográfica ===");
+//
+//            System.out.print("ISBN: ");
+//            String isbn = scanner.nextLine().trim();
+//
+//            System.out.print("Clasificado Dewey: ");
+//            String clasificadoDewey = scanner.nextLine().trim();
+//
+//            System.out.print("Estantería: ");
+//            String estanteria = scanner.nextLine().trim();
+//
+//            System.out.println("Seleccione el idioma:");
+//            int i = 1;
+//            for (Idioma idioma : Idioma.values()) {
+//                System.out.println(i++ + ". " + idioma);
+//            }
+//            System.out.print("Opción: ");
+//            int opcionIdioma = Integer.parseInt(scanner.nextLine());
+//
+//            Idioma idiomaSeleccionado = Idioma.values()[opcionIdioma - 1];
+//
+//            // Crear ficha
+//            FichaBibliografica ficha = new FichaBibliografica(
+//                isbn,
+//                clasificadoDewey,
+//                estanteria
+//            );
+//            ficha.setIdioma(idiomaSeleccionado);
+//
+//            fichaBibliograficaService.insertar(ficha);
+//
+//            System.out.println("Ficha creada con éxito. ID: " + ficha.getId());
+//
+//        } catch (Exception e) {
+//            System.err.println("Error al crear ficha bibliográfica: " + e.getMessage());
+//        }
+//    }
 
 //Crear ficha desde la creacion de Libro
     
@@ -278,17 +288,19 @@ public class MenuHandler {
         ficha.setEstanteria(estanteria);
         ficha.setIdioma(idioma);
 
+        return ficha;
+    }
+    
+    public void persistirFicha(FichaBibliografica ficha){
         try {
             fichaBibliograficaService.insertar(ficha);
 
-            return ficha; // nunca null
-
         } catch (Exception e) {
             System.err.println("Error al crear ficha: " + e.getMessage());
-
-            return null;
         }
     }
+    
+    
 
     //Listar fichas:
     public void listarFichasBibliograficas() {
