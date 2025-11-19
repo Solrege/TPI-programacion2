@@ -42,8 +42,11 @@ TPI-programacion2/
         │   ├── GenericDAO.java  
         │   └── LibroDAO.java  
         ├── main/  
-        │   └── Principal.java
-            ├── FichaBibliografica.java    
+        │   └── AppMenu.java
+        |   ├── MenuDisplay.java
+        |   ├── MenuHandler.java
+        |   |── Principal.java
+        |   └── TestConnection
         ├── models/  
         │   ├── Base.java  
         │   ├── FichaBibliografica.java  
@@ -107,11 +110,11 @@ Con éste archivo que se ubica en `main\TestConnection.java` se debe ejecutar y 
 
 # Ejecutar el Sistema Completo
 
-Abrir el proyecto en tu IDE (IntelliJ IDEA, NetBeans, Eclipse), nosotras utilizamos NetBeans
+Abrir el proyecto en tu IDE (IntelliJ IDEA, NetBeans, Eclipse), nosotras utilizamos NetBeans.
 
-Hay que asegurarse de tener el driver JDBC de MySQL en el classpath del proyecto
+Hay que asegurarse de tener el driver JDBC de MySQL en el classpath del proyecto.
 
-El archivo principal es `\Principal.Java` ubicado en el main. Es el punto de entrada del sistema y el lo primero que se eje
+El archivo principal es `\Principal.Java` ubicado en el main. Es el punto de entrada del sistema y es lo primero que se ejecuta.
 
 Su funcion es inicializar objetos básicos (Libro y ficha_bibliografica), mostrar un ejemplo simple por consola e iniciar un menú interactivo del sistema.
 
